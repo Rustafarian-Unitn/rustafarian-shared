@@ -5,7 +5,17 @@ Shared code for the Rustafarian group:
 - Messages: messages to send between clients, servers, and simulation controller;
 - Assembler/Disassembler: assemble/disassemble text into fragments
 
-How to implement?
+## Getting started
+
+Import the library:
+
+```rust
+rustafarian-shared = { git = "https://github.com/Rustafarian-Unitn/rustafarian-shared", branch = "main" }
+```
+
+### Implementation
+
+How to implement new messages?
 
 For the messages, you need to implement a Wrapper for the messages you need. For example, the chat clients expects ChatResponses (ClientList, Message), and the ServerType (Chat, Browser).
 
