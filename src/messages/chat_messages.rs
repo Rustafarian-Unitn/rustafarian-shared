@@ -37,3 +37,6 @@ pub enum ChatResponseWrapper {
     Chat(ChatResponse),
     ServerType(ServerTypeResponse),
 }
+
+impl Response for ChatResponseWrapper {}
+impl DroneSend for ChatResponseWrapper {}
