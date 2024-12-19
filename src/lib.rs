@@ -1,2 +1,2 @@
-mod messages;
-mod assembler;
+pub mod messages;
+pub mod assembler;
