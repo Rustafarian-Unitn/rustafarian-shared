@@ -41,6 +41,18 @@ fn handle_reassembled_string(reassembled_string: String) {
                 ResponseWrapper::Chat(chat_response) => {
                     println!("Received a ChatResponse: {:?}", chat_response);
                     // Process the chat response
+                    match chat_response {
+                        ChatResponse::ClientList(client_list) => {
+                            println!("Client list: {:?}", client_list);
+                            self.available_clients = client_list;
+                        }
+                        ChatResponse::MessageFrom { from, message } => {
+                            println!("Message from {}: {:?}", from, message);
+                        }
+                        ChatResponse::MessageSent => {
+                            println!("Message sent");
+                        }
+                    }
                 }
                 ResponseWrapper::ServerType(server_response) => {
                     println!("Received a ServerTypeResponse: {:?}", server_response);
