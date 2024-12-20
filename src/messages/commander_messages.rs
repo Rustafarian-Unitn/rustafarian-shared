@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use wg_2024::network::NodeId;
+use wg_2024::{network::NodeId, packet::Packet};
 
 use crate::messages::general_messages::{DroneSend, Request};
 
@@ -17,3 +17,33 @@ pub enum SimControllerCommand {
 
 impl DroneSend for SimControllerCommand {}
 impl Request for SimControllerCommand {}
+
+/**
+ * Messages that can be sent from the clients to the simulation controller
+ */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SimControllerMessage {
+    FloodResponse(NodeId), // Response to a flood request
+    TopologyResponse(NodeId, Vec<NodeId>), // Response to a topology request
+    ClientListResponse(NodeId, Vec<NodeId>), // The client list associated to a server, as the client knows it
+    MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
+}
+
+impl DroneSend for SimControllerMessage {}
+impl Request for SimControllerMessage {}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SimControllerEvent {
+    PacketReceived(u64), // Packet id?
+    MessageSent(NodeId, NodeId, String), // A message sent by a client (server_id, node_to, message)
+    FloodRequestSent,
+    PacketSent(u64), // Maybe?
+}
+
+impl DroneSend for SimControllerEvent {}
+impl Request for SimControllerEvent {}
+
+pub enum SimControllerResponseWrapper {
+    Message(SimControllerMessage),
+    Event(SimControllerEvent),
+}
