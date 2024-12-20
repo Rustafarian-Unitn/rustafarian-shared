@@ -15,8 +15,8 @@ pub enum SimControllerCommand {
     ClientList(NodeId),          // Get the list of available clients from a server
     FloodRequest,                // Send a flood request
     Topology,                    // Get the topology of the network
-    RequestTextFile(String, NodeId), // Request a text file from the server (filename, server_id)
-    RequestMediaFile(String, NodeId), // Request a media file from the server (filename, server_id)
+    RequestTextFile(u8, NodeId), // Request a text file from the server (filename, server_id)
+    RequestMediaFile(u8, NodeId), // Request a media file from the server (filename, server_id)
     RequestFileList(NodeId), // Request the list of available files from the server
 }
 
@@ -32,6 +32,9 @@ pub enum SimControllerMessage {
     TopologyResponse(Topology), // Response to a topology request
     ClientListResponse(NodeId, Vec<NodeId>), // The client list associated to a server, as the client knows it
     MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
+    TextFileResponse(u8, String), // Response to a text file request
+    MediaFileResponse(u8, String), // Response to a media file request
+    FileListResponse(Vec<u8>), // Response to a file list request
 }
 
 impl DroneSend for SimControllerMessage {}
