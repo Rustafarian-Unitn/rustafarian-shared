@@ -4,6 +4,7 @@ Shared code for the Rustafarian group:
 
 - Messages: messages to send between clients, servers, and simulation controller;
 - Assembler/Disassembler: assemble/disassemble text into fragments
+- Topology: a representation of the network
 
 ## Getting started
 
