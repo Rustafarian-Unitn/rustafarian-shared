@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use wg_2024::network::NodeId;
 
-use crate::messages::general_messages::{DroneSend, Request};
+use crate::{messages::general_messages::{DroneSend, Request}, topology::Topology};
 
 use super::general_messages::Response;
 
@@ -26,7 +26,7 @@ impl Response for SimControllerChatCommand {}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SimControllerMessage {
     FloodResponse(NodeId), // Response to a flood request
-    TopologyResponse(NodeId, Vec<NodeId>), // Response to a topology request
+    TopologyResponse(Topology), // Response to a topology request
     ClientListResponse(NodeId, Vec<NodeId>), // The client list associated to a server, as the client knows it
     MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
 }
