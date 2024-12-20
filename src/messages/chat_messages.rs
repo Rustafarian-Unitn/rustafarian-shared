@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use wg_2024::network::NodeId;
 use crate::messages::general_messages::{DroneSend, Request, Response, ServerTypeResponse};
 
+use super::general_messages::ServerTypeRequest;
+
 /**
  * Request type for a chat client
  */
@@ -40,3 +42,12 @@ pub enum ChatResponseWrapper {
 
 impl Response for ChatResponseWrapper {}
 impl DroneSend for ChatResponseWrapper {}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ChatRequestWrapper {
+    Chat(ChatRequest),
+    ServerType(ServerTypeRequest),
+}
+
+impl Request for ChatRequestWrapper {}
+impl DroneSend for ChatRequestWrapper {}
