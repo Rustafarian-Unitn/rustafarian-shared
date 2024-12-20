@@ -3,6 +3,8 @@ use wg_2024::network::NodeId;
 
 use crate::messages::general_messages::{DroneSend, Request};
 
+use super::general_messages::Response;
+
 /**
  * Command that can be sent from the simulation controller to the (chat) clients
  */
@@ -16,7 +18,7 @@ pub enum SimControllerChatCommand {
 }
 
 impl DroneSend for SimControllerChatCommand {}
-impl Request for SimControllerChatCommand {}
+impl Response for SimControllerChatCommand {}
 
 /**
  * Messages that can be sent from the clients to the simulation controller
@@ -43,7 +45,10 @@ pub enum SimControllerEvent {
 impl DroneSend for SimControllerEvent {}
 impl Request for SimControllerEvent {}
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SimControllerResponseWrapper {
     Message(SimControllerMessage),
     Event(SimControllerEvent),
 }
+
+impl DroneSend for SimControllerResponseWrapper {}
