@@ -9,16 +9,19 @@ use super::general_messages::Response;
  * Command that can be sent from the simulation controller to the (chat) clients
  */
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum SimControllerChatCommand {
+pub enum SimControllerCommand {
     SendMessage(String, NodeId, NodeId), // Send message to a server, the first id is the server, the second the destination client
     Register(NodeId),            // Register a client to a server
     ClientList(NodeId),          // Get the list of available clients from a server
     FloodRequest,                // Send a flood request
     Topology,                    // Get the topology of the network
+    RequestTextFile(String, NodeId), // Request a text file from the server (filename, server_id)
+    RequestMediaFile(String, NodeId), // Request a media file from the server (filename, server_id)
+    RequestFileList(NodeId), // Request the list of available files from the server
 }
 
-impl DroneSend for SimControllerChatCommand {}
-impl Response for SimControllerChatCommand {}
+impl DroneSend for SimControllerCommand {}
+impl Response for SimControllerCommand {}
 
 /**
  * Messages that can be sent from the clients to the simulation controller
