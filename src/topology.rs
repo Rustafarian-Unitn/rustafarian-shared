@@ -3,6 +3,7 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 
 /// A simple graph representation of the network topology
+#[derive(Clone, Debug)]
 pub struct Topology {
     nodes: Vec<NodeId>,                  // The list of nodes in the topology
     edges: HashMap<NodeId, Vec<NodeId>>, // All the connections between nodes.
