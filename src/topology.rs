@@ -68,7 +68,7 @@ impl Topology {
         &self.edges
     }
 
-    pub(crate) fn get_routing_header(
+    pub fn get_routing_header(
         &self,
         client_id: NodeId,
         server_id: NodeId,
