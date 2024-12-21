@@ -23,7 +23,7 @@ impl Request for BrowserRequest {}
 pub enum BrowserResponse {
     FileList(Vec<u8>),
     TextFile(String),
-    MediaFile(String),
+    MediaFile(Vec<u8>),
 }
 
 impl DroneSend for BrowserResponse {}
