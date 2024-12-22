@@ -45,7 +45,7 @@ pub enum SimControllerEvent {
     PacketReceived(u64), // Packet id?
     MessageSent(NodeId, NodeId, String), // A message sent by a client (server_id, node_to, message)
     FloodRequestSent,
-    PacketSent(u64), // Maybe?
+    PacketSent{session_id: u64, packet_type: String}, // To recognize the type of the original packet sent without generating a new enum
 }
 
 impl DroneSend for SimControllerEvent {}
