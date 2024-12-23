@@ -80,6 +80,14 @@ impl Topology {
         header.hop_index = 1;
         header
     }
+    
+    pub fn remove_node(&mut self, node_id: NodeId) {
+        self.nodes.retain(|&x| x != node_id);
+        self.edges.remove(&node_id);
+        for (_, neighbors) in self.edges.iter_mut() {
+            neighbors.retain(|&x| x != node_id);
+        }
+    }
 }
 
 // BFS search between a starting node and a destination
