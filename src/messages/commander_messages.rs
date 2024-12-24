@@ -33,7 +33,7 @@ pub enum SimControllerMessage {
     ClientListResponse(NodeId, Vec<NodeId>), // The client list associated to a server, as the client knows it
     MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
     TextFileResponse(u8, String), // Response to a text file request
-    MediaFileResponse(u8, String), // Response to a media file request
+    MediaFileResponse(u8, Vec<u8>), // Response to a media file request
     FileListResponse(Vec<u8>), // Response to a file list request
 }
 
