@@ -28,7 +28,7 @@ impl Response for SimControllerCommand {}
  */
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SimControllerMessage {
-    FloodResponse(NodeId), // Response to a flood request
+    FloodResponse(u64), // Response to a flood request
     TopologyResponse(Topology), // Response to a topology request
     ClientListResponse(NodeId, Vec<NodeId>), // The client list associated to a server, as the client knows it
     MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
