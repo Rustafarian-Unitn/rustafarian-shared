@@ -22,8 +22,8 @@ impl Request for BrowserRequest {}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum BrowserResponse {
     FileList(Vec<u8>),
-    TextFile(String),
-    MediaFile(Vec<u8>),
+    TextFile(u8, String),
+    MediaFile(u8, Vec<u8>),
 }
 
 impl DroneSend for BrowserResponse {}
