@@ -7,7 +7,8 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Topology {
     nodes: Vec<NodeId>,                  // The list of nodes in the topology
-    edges: HashMap<NodeId, Vec<NodeId>>, // All the connections between nodes.
+    edges: HashMap<NodeId, HashSet<NodeId>>, // All the connections between nodes.
+    labels: HashMap<NodeId, String>,     // The labels of the nodes
 }
 
 impl Topology {
@@ -16,32 +17,20 @@ impl Topology {
         Topology {
             nodes: Vec::new(),
             edges: HashMap::new(),
+            labels: HashMap::new(),
         }
     }
 
     /// Add a new node to the topology (NodeId: u8)
     pub fn add_node(&mut self, node: NodeId) {
         self.nodes.push(node);
-        self.edges.insert(node, Vec::new());
+        self.edges.insert(node, HashSet::new());
     }
 
     /// Add a new edge between two nodes
     pub fn add_edge(&mut self, from: NodeId, to: NodeId) {
-        match self.edges.get_mut(&from) {
-            Some(x) => {
-                x.push(to);
-            }
-            None => {
-                self.edges.insert(from, vec![to]);
-            }
-        }
-
-        match self.edges.get_mut(&to) {
-            Some(x) => x.push(from),
-            None => {
-                self.edges.insert(to, vec![from]);
-            }
-        }
+        self.edges.entry(from).or_insert(HashSet::new()).insert(to);
+        self.edges.entry(to).or_insert(HashSet::new()).insert(from);
     }
 
     /// Get the neighbors of a node
@@ -66,7 +55,7 @@ impl Topology {
     }
 
     /// Get the edges of the topology
-    pub fn edges(&self) -> &HashMap<NodeId, Vec<NodeId>> {
+    pub fn edges(&self) -> &HashMap<NodeId, HashSet<NodeId>> {
         &self.edges
     }
 
@@ -88,6 +77,15 @@ impl Topology {
             neighbors.retain(|&x| x != node_id);
         }
     }
+
+    pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
+        self.labels.get(&node_id)
+    }
+
+    pub fn set_label(&mut self, node_id: NodeId, label: String) {
+        self.labels.insert(node_id, label);
+    }
+    
 }
 
 // BFS search between a starting node and a destination
