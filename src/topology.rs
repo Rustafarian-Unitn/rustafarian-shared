@@ -9,6 +9,7 @@ pub struct Topology {
     nodes: Vec<NodeId>,                  // The list of nodes in the topology
     edges: HashMap<NodeId, HashSet<NodeId>>, // All the connections between nodes.
     labels: HashMap<NodeId, String>,     // The labels of the nodes
+    node_types: HashMap<NodeId, String>,      // The types of the nodes
 }
 
 impl Topology {
@@ -18,6 +19,7 @@ impl Topology {
             nodes: Vec::new(),
             edges: HashMap::new(),
             labels: HashMap::new(),
+            node_types: HashMap::new(),
         }
     }
 
@@ -84,6 +86,14 @@ impl Topology {
 
     pub fn set_label(&mut self, node_id: NodeId, label: String) {
         self.labels.insert(node_id, label);
+    }
+
+    pub fn get_node_type(&self, node_id: NodeId) -> Option<&String> {
+        self.node_types.get(&node_id)
+    }
+
+    pub fn set_node_type(&mut self, node_id: NodeId, node_type: String) {
+        self.node_types.insert(node_id, node_type);
     }
     
 }
