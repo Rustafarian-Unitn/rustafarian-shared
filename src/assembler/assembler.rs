@@ -29,10 +29,7 @@ impl Assembler {
     //adds the fragment based on the session id and returns it if the message is complete
     pub fn add_fragment(&mut self, fragment: Fragment, session_id: u64) -> Option<Vec<u8>> {
         //check if session id already present or create empty entry with new Vec
-        let fragments = self
-            .received_fragment
-            .entry(session_id)
-            .or_default();
+        let fragments = self.received_fragment.entry(session_id).or_default();
 
         //push the fragment in the right vec
         fragments.push(fragment);

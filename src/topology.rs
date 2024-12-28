@@ -6,10 +6,10 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 /// A simple graph representation of the network topology
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Topology {
-    nodes: Vec<NodeId>,                  // The list of nodes in the topology
+    nodes: Vec<NodeId>,                      // The list of nodes in the topology
     edges: HashMap<NodeId, HashSet<NodeId>>, // All the connections between nodes.
-    labels: HashMap<NodeId, String>,     // The labels of the nodes
-    node_types: HashMap<NodeId, String>,      // The types of the nodes
+    labels: HashMap<NodeId, String>,         // The labels of the nodes
+    node_types: HashMap<NodeId, String>,     // The types of the nodes
 }
 
 impl Default for Topology {
@@ -43,11 +43,7 @@ impl Topology {
 
     /// Get the neighbors of a node
     pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
-        self.edges
-            .get(&node_id)
-            .unwrap()
-            .iter().copied()
-            .collect()
+        self.edges.get(&node_id).unwrap().iter().copied().collect()
     }
 
     /// Clear the topology
@@ -76,7 +72,7 @@ impl Topology {
         header.hop_index = 1;
         header
     }
-    
+
     pub fn remove_node(&mut self, node_id: NodeId) {
         self.nodes.retain(|&x| x != node_id);
         self.edges.remove(&node_id);
@@ -100,7 +96,6 @@ impl Topology {
     pub fn set_node_type(&mut self, node_id: NodeId, node_type: String) {
         self.node_types.insert(node_id, node_type);
     }
-    
 }
 
 // BFS search between a starting node and a destination

@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::messages::general_messages::{DroneSend, Request, Response, ServerTypeResponse};
+use serde::{Deserialize, Serialize};
 
 use super::general_messages::ServerTypeRequest;
 
