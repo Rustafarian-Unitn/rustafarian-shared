@@ -12,6 +12,12 @@ pub struct Topology {
     node_types: HashMap<NodeId, String>,      // The types of the nodes
 }
 
+impl Default for Topology {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Topology {
     /// Create a new empty topology
     pub fn new() -> Self {
@@ -31,8 +37,8 @@ impl Topology {
 
     /// Add a new edge between two nodes
     pub fn add_edge(&mut self, from: NodeId, to: NodeId) {
-        self.edges.entry(from).or_insert(HashSet::new()).insert(to);
-        self.edges.entry(to).or_insert(HashSet::new()).insert(from);
+        self.edges.entry(from).or_default().insert(to);
+        self.edges.entry(to).or_default().insert(from);
     }
 
     /// Get the neighbors of a node
@@ -40,8 +46,7 @@ impl Topology {
         self.edges
             .get(&node_id)
             .unwrap()
-            .iter()
-            .map(|&x| x)
+            .iter().copied()
             .collect()
     }
 

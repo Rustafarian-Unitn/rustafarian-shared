@@ -13,6 +13,12 @@ pub struct Assembler {
     received_fragment: HashMap<u64, Vec<Fragment>>,
 }
 
+impl Default for Assembler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Assembler {
     pub fn new() -> Self {
         Assembler {
@@ -26,7 +32,7 @@ impl Assembler {
         let fragments = self
             .received_fragment
             .entry(session_id)
-            .or_insert_with(Vec::new);
+            .or_default();
 
         //push the fragment in the right vec
         fragments.push(fragment);
