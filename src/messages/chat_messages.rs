@@ -28,7 +28,7 @@ impl Request for ChatRequest {}
 pub enum ChatResponse {
     ClientList(Vec<NodeId>), // Response to a client when the list of clients is requested
     MessageFrom { from: NodeId, message: Vec<u8> }, // Response to a client when a message is received
-    MessageSent, // Response to a client when the message is sent successfully
+    MessageSent,      // Response to a client when the message is sent successfully
     ClientRegistered, // Response to a client when the registration is successful
 }
 
