@@ -13,6 +13,12 @@ pub struct Assembler {
     received_fragment: HashMap<u64, Vec<Fragment>>,
 }
 
+impl Default for Assembler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Assembler {
     pub fn new() -> Self {
         Assembler {
@@ -23,10 +29,7 @@ impl Assembler {
     //adds the fragment based on the session id and returns it if the message is complete
     pub fn add_fragment(&mut self, fragment: Fragment, session_id: u64) -> Option<Vec<u8>> {
         //check if session id already present or create empty entry with new Vec
-        let fragments = self
-            .received_fragment
-            .entry(session_id)
-            .or_insert_with(Vec::new);
+        let fragments = self.received_fragment.entry(session_id).or_default();
 
         //push the fragment in the right vec
         fragments.push(fragment);

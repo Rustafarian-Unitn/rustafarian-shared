@@ -1,6 +1,6 @@
+use crate::messages::general_messages::{DroneSend, Request, Response, ServerTypeResponse};
 use serde::{Deserialize, Serialize};
 use wg_2024::network::NodeId;
-use crate::messages::general_messages::{DroneSend, Request, Response, ServerTypeResponse};
 
 use super::general_messages::ServerTypeRequest;
 
@@ -26,9 +26,10 @@ impl Request for ChatRequest {}
  */
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ChatResponse {
-    ClientList(Vec<NodeId>),
-    MessageFrom { from: NodeId, message: Vec<u8> },
-    MessageSent,
+    ClientList(Vec<NodeId>), // Response to a client when the list of clients is requested
+    MessageFrom { from: NodeId, message: Vec<u8> }, // Response to a client when a message is received
+    MessageSent, // Response to a client when the message is sent successfully
+    ClientRegistered, // Response to a client when the registration is successful
 }
 
 impl DroneSend for ChatResponse {}

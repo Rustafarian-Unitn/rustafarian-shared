@@ -12,6 +12,12 @@ pub const FRAGMENT_DSIZE: usize = 128;
 
 pub struct Disassembler {}
 
+impl Default for Disassembler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Disassembler {
     //create hashmap empty
     pub fn new() -> Self {
