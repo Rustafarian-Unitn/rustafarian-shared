@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use wg_2024::network::NodeId;
 
@@ -6,7 +8,7 @@ use crate::{
     topology::Topology,
 };
 
-use super::general_messages::Response;
+use super::general_messages::{Response, ServerType};
 
 /**
  * Command that can be sent from the simulation controller to the (chat) clients
@@ -21,6 +23,8 @@ pub enum SimControllerCommand {
     RequestTextFile(u8, NodeId), // Request a text file from the server (filename, server_id)
     RequestMediaFile(u8, NodeId), // Request a media file from the server (filename, server_id)
     RequestFileList(NodeId),     // Request the list of available files from the server
+    KnownServers,                // Request the client its list of known servers
+    RegisteredServers,
 }
 
 impl DroneSend for SimControllerCommand {}
@@ -31,13 +35,16 @@ impl Response for SimControllerCommand {}
  */
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SimControllerMessage {
-    FloodResponse(u64),                      // Response to a flood request
-    TopologyResponse(Topology),              // Response to a topology request
+    FloodResponse(u64),                        // Response to a flood request
+    TopologyResponse(Topology),                // Response to a topology request
     ClientListResponse(NodeId, Vec<NodeId>), // The client list associated to a server, as the client knows it
     MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
     TextFileResponse(u8, String),            // Response to a text file request
     MediaFileResponse(u8, Vec<u8>),          // Response to a media file request
     FileListResponse(Vec<u8>),               // Response to a file list request
+    ServerTypeResponse(NodeId, ServerType),  // Response to ServerType request from a client
+    KnownServers(HashMap<NodeId, ServerType>), // Response to KnownServers request from a client
+    RegisteredServersResponse(Vec<u8>),      // Response to a list of registered servers
 }
 
 impl DroneSend for SimControllerMessage {}
