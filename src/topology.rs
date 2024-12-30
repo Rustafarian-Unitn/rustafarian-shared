@@ -43,7 +43,7 @@ impl Topology {
 
     /// Get the neighbors of a node
     pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
-        self.edges.get(&node_id).unwrap_or(HashSet::new()).iter().copied().collect()
+        self.edges.get(&node_id).unwrap_or(&HashSet::new()).iter().copied().collect()
     }
 
     /// Clear the topology
