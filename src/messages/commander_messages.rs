@@ -21,6 +21,7 @@ pub enum SimControllerCommand {
     RequestTextFile(u8, NodeId), // Request a text file from the server (filename, server_id)
     RequestMediaFile(u8, NodeId), // Request a media file from the server (filename, server_id)
     RequestFileList(NodeId),     // Request the list of available files from the server
+    RemoveSender(NodeId),        // Remove a sender from the list of neighbors
 }
 
 impl DroneSend for SimControllerCommand {}
