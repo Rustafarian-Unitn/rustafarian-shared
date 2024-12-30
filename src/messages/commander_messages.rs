@@ -7,13 +7,15 @@ use crate::{
     messages::general_messages::{DroneSend, Request},
     topology::Topology,
 };
+use wg_2024::packet::Packet;
+use crossbeam_channel::Sender;
 
 use super::general_messages::{Response, ServerType};
 
 /**
  * Command that can be sent from the simulation controller to the (chat) clients
  */
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum SimControllerCommand {
     SendMessage(String, NodeId, NodeId), // Send message to a server, the first id is the server, the second the destination client
     Register(NodeId),                    // Register a client to a server
@@ -24,11 +26,11 @@ pub enum SimControllerCommand {
     RequestMediaFile(u8, NodeId), // Request a media file from the server (filename, server_id)
     RequestFileList(NodeId),     // Request the list of available files from the server
     KnownServers,                // Request the client its list of known servers
-    RegisteredServers,
+    RegisteredServers,           // Request the list of servers to which the client is registered
+    RemoveSender(NodeId),
+    AddSender(NodeId, Sender<Packet>)
 }
 
-impl DroneSend for SimControllerCommand {}
-impl Response for SimControllerCommand {}
 
 /**
  * Messages that can be sent from the clients to the simulation controller
@@ -68,7 +70,7 @@ pub enum SimControllerEvent {
         packet_type: String,
         source: NodeId,
         destination: NodeId,
-    }, // To recognize the type of the original packet sent without generating a new enum
+    }, // Packet forwarded through the simulation controller 
 }
 
 impl DroneSend for SimControllerEvent {}
