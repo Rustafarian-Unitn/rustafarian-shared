@@ -1,16 +1,15 @@
+use crossbeam_channel::Sender;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use wg_2024::network::NodeId;
+use wg_2024::{network::NodeId, packet::Packet};
 
 use crate::{
     messages::general_messages::{DroneSend, Request},
     topology::Topology,
 };
-use wg_2024::packet::Packet;
-use crossbeam_channel::Sender;
 
-use super::general_messages::{Response, ServerType};
+use super::general_messages::ServerType;
 
 /**
  * Command that can be sent from the simulation controller to the (chat) clients
@@ -27,10 +26,9 @@ pub enum SimControllerCommand {
     RequestFileList(NodeId),     // Request the list of available files from the server
     KnownServers,                // Request the client its list of known servers
     RegisteredServers,           // Request the list of servers to which the client is registered
-    RemoveSender(NodeId),
-    AddSender(NodeId, Sender<Packet>)
+    RemoveSender(NodeId),        // Remove a sender from the list of neighbors
+    AddSender(NodeId, Sender<Packet>), // Add a sender to the list of neighbors
 }
-
 
 /**
  * Messages that can be sent from the clients to the simulation controller
@@ -70,7 +68,7 @@ pub enum SimControllerEvent {
         packet_type: String,
         source: NodeId,
         destination: NodeId,
-    }, // Packet forwarded through the simulation controller 
+    }, // Packet forwarded through the simulation controller
 }
 
 impl DroneSend for SimControllerEvent {}
