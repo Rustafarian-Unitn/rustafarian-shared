@@ -28,6 +28,7 @@ pub enum SimControllerCommand {
     RegisteredServers,           // Request the list of servers to which the client is registered
     RemoveSender(NodeId),        // Remove a sender from the list of neighbors
     AddSender(NodeId, Sender<Packet>), // Add a sender to the list of neighbors
+    RequestServerType(NodeId),        // Request the type of a server
 }
 
 /**
@@ -45,6 +46,7 @@ pub enum SimControllerMessage {
     ServerTypeResponse(NodeId, ServerType),  // Response to ServerType request from a client
     KnownServers(HashMap<NodeId, ServerType>), // Response to KnownServers request from a client
     RegisteredServersResponse(Vec<u8>),      // Response to a list of registered servers
+    ServerTypeResponse(NodeId, ServerType),  // Response to ServerType request from a client
 }
 
 impl DroneSend for SimControllerMessage {}
