@@ -41,6 +41,11 @@ impl Topology {
         self.edges.entry(to).or_default().insert(from);
     }
 
+    pub fn remove_edge(&mut self, from: NodeId, to: NodeId) {
+        self.edges.entry(from).or_default().remove(&to);
+        self.edges.entry(to).or_default().remove(&from);
+    }
+
     /// Get the neighbors of a node
     pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
         self.edges.get(&node_id).unwrap_or(&HashSet::new()).iter().copied().collect()
