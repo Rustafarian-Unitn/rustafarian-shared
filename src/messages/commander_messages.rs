@@ -46,6 +46,7 @@ pub enum SimControllerMessage {
     ServerTypeResponse(NodeId, ServerType),  // Response to ServerType request from a client
     KnownServers(HashMap<NodeId, ServerType>), // Response to KnownServers request from a client
     RegisteredServersResponse(Vec<u8>),      // Response to a list of registered servers
+    TextWithReferences(u8, String, HashMap<u8, Vec<u8>>) // File Id, Text, References
 }
 
 impl DroneSend for SimControllerMessage {}
