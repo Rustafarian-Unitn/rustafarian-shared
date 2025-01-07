@@ -81,6 +81,19 @@ impl Topology {
         }
     }
 
+    /// Function that removed the edges between two node, both from node1 to node2 and vice versa
+    pub fn remove_edges(&mut self, node1: NodeId, node2: NodeId) {
+
+        for (&id, neighbors) in self.edges.iter_mut() {
+
+            if id == node1 {
+                neighbors.retain(|&id| id != node2);
+            } else if id == node2 {
+                neighbors.retain(|&id| id != node1);
+            }
+        }
+    }
+
     pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
         self.labels.get(&node_id)
     }
