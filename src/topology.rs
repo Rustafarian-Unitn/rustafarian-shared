@@ -3,6 +3,19 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use serde::{Deserialize, Serialize};
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 
+/// History of a drone, recording the total number of packet sent and the number of packet dropped
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct NodePacketHistory {
+    pub packets_sent: u64,
+    pub packets_dropped: u64
+}
+
+impl Default for NodePacketHistory {
+    fn default() -> Self {
+        NodePacketHistory{ packets_sent: 0, packets_dropped: 0 }
+    }
+}
+
 /// A simple graph representation of the network topology
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Topology {
@@ -10,6 +23,9 @@ pub struct Topology {
     edges: HashMap<NodeId, HashSet<NodeId>>, // All the connections between nodes.
     labels: HashMap<NodeId, String>,         // The labels of the nodes
     node_types: HashMap<NodeId, String>,     // The types of the nodes
+
+    // PDR Mapping
+    node_histories: HashMap<NodeId, NodePacketHistory>
 }
 
 impl Default for Topology {
@@ -26,6 +42,7 @@ impl Topology {
             edges: HashMap::new(),
             labels: HashMap::new(),
             node_types: HashMap::new(),
+            node_histories: HashMap::new()
         }
     }
 
@@ -92,6 +109,30 @@ impl Topology {
                 neighbors.retain(|&id| id != node1);
             }
         }
+    }
+
+    /// Function that updates the history of a list of nodes, based on the drooped flag
+    ///
+    /// # Args
+    /// * `node_id: Vec<NodeId>` - vector of nodes to update
+    /// * `dropped: bool` - if `true` then will increase the packets_dropped, else the packets_sent
+    pub fn update_node_history(&mut self, node_ids: Vec<NodeId>, dropped: bool) {
+
+        for id in node_ids {
+            let history = self.node_histories.entry(id).or_default();
+            if dropped {
+                history.packets_dropped += 1;
+            } else {
+                history.packets_sent += 1;
+            }
+        }
+    }
+
+    /// Function that returns the estimated PDR, based on the history of the node
+    pub fn pdr_for_node(&mut self, node_id: NodeId) -> u64 {
+
+        let history = self.node_histories.entry(node_id).or_default();
+        history.packets_dropped / history.packets_sent
     }
 
     pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
