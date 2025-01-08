@@ -4,19 +4,10 @@ use serde::{Deserialize, Serialize};
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 
 /// History of a drone, recording the total number of packet sent and the number of packet dropped
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct NodePacketHistory {
     pub packets_sent: u64,
     pub packets_dropped: u64,
-}
-
-impl Default for NodePacketHistory {
-    fn default() -> Self {
-        NodePacketHistory {
-            packets_sent: 0,
-            packets_dropped: 0,
-        }
-    }
 }
 
 /// A simple graph representation of the network topology
