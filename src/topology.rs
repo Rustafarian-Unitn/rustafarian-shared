@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 use serde::{Deserialize, Serialize};
 use wg_2024::network::{NodeId, SourceRoutingHeader};
@@ -79,12 +79,12 @@ impl Topology {
     }
 
     pub fn get_routing_header(
-        &self,
+        &mut self,
         client_id: NodeId,
         server_id: NodeId,
     ) -> wg_2024::network::SourceRoutingHeader {
         let mut header = SourceRoutingHeader::empty_route();
-        header.hops = compute_route(self, client_id, server_id);
+        header.hops = compute_route_dijkstra(self, client_id, server_id);
         header.hop_index = 1;
         header
     }
@@ -125,12 +125,13 @@ impl Topology {
         }
     }
 
-    /// Function that returns the estimated PDR, based on the history of the node
+    /// Function that returns the estimated PDR, from 0 to 100, based on the history of the node.
     pub fn pdr_for_node(&mut self, node_id: NodeId) -> u64 {
+
         let history = self.node_histories.entry(node_id).or_default();
 
         if history.packets_sent > 0 {
-            history.packets_dropped / history.packets_sent
+            (history.packets_dropped / history.packets_sent) * 100
         } else {
             0
         }
@@ -182,6 +183,64 @@ pub fn compute_route(
                 visited.insert(neighbor);
                 parent.insert(neighbor, current_node);
                 queue.push_back(neighbor);
+            }
+        }
+    }
+    route
+}
+
+/// Compute a route between two nodes, using an adaptation of the Dijkstra algorithm, where the
+/// distance between the nodes is found using the PDR of the node
+pub fn compute_route_dijkstra(
+    topology: &mut Topology,
+    source_id: NodeId,
+    destination_id: NodeId,
+) -> Vec<NodeId> {
+
+
+    let mut route = Vec::new(); // Final route
+    let mut visited = HashSet::new(); // Node already visited
+    let mut queue = BinaryHeap::new(); // Used to prioritize nodes based on PDR
+    // "Distances" to each node, it is based on the PDR for each node
+    let mut distances = HashMap::new();
+    let mut parent = HashMap::new();
+
+    // Initiate the source with distance 0, since it is the starting point
+    distances.insert(source_id, 0);
+    queue.push((0, source_id));
+
+    while let Some((current_distance, current_node)) = queue.pop() {
+
+        // If destination is reached, then reconstruct the path, based on the parents nodes and
+        // reversing it at the end
+        if current_node == destination_id {
+            let mut node = destination_id;
+            while node != source_id {
+                route.push(node);
+                node = parent[&node];
+            }
+            route.push(source_id);
+            route.reverse();
+            return route;
+        }
+
+        // If the node has already been visited, then ignore it
+        if !visited.insert(current_node) {
+            continue;
+        }
+
+        for neighbor in topology.neighbors(current_node) {
+            // For every neighbour of the current node, find the distance (cumulative)
+            // from the source to the node, based on the PDR
+            let drop_rate = topology.pdr_for_node(neighbor);
+            let new_distance = current_distance + drop_rate;
+
+            // If the distance is less then the one that was already found, then insert
+            // this as the new distance, and update the parent map
+            if new_distance < *distances.get(&neighbor).unwrap_or(&u64::MAX) {
+                distances.insert(neighbor, new_distance);
+                parent.insert(neighbor, current_node);
+                queue.push((new_distance, neighbor));
             }
         }
     }
