@@ -111,15 +111,16 @@ impl Topology {
         }
     }
 
-    /// Function that updates the history of a list of nodes, based on the drooped flag
+    /// Function that updates the history of a list of nodes, based on the drooped flag.
+    /// Should only be called for MsgFragment, since they are the only droppable packets
     ///
     /// # Args
     /// * `node_id: Vec<NodeId>` - vector of nodes to update
     /// * `dropped: bool` - if `true` then will increase the packets_dropped, else the packets_sent
-    pub fn update_node_history(&mut self, node_ids: Vec<NodeId>, dropped: bool) {
+    pub fn update_node_history(&mut self, node_ids: &Vec<NodeId>, dropped: bool) {
 
         for id in node_ids {
-            let history = self.node_histories.entry(id).or_default();
+            let history = self.node_histories.entry(*id).or_default();
             if dropped {
                 history.packets_dropped += 1;
             } else {
@@ -132,7 +133,12 @@ impl Topology {
     pub fn pdr_for_node(&mut self, node_id: NodeId) -> u64 {
 
         let history = self.node_histories.entry(node_id).or_default();
-        history.packets_dropped / history.packets_sent
+
+        if history.packets_sent > 0 {
+            history.packets_dropped / history.packets_sent
+        } else {
+            0
+        }
     }
 
     pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
