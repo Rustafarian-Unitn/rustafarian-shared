@@ -7,12 +7,15 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NodePacketHistory {
     pub packets_sent: u64,
-    pub packets_dropped: u64
+    pub packets_dropped: u64,
 }
 
 impl Default for NodePacketHistory {
     fn default() -> Self {
-        NodePacketHistory{ packets_sent: 0, packets_dropped: 0 }
+        NodePacketHistory {
+            packets_sent: 0,
+            packets_dropped: 0,
+        }
     }
 }
 
@@ -25,7 +28,7 @@ pub struct Topology {
     node_types: HashMap<NodeId, String>,     // The types of the nodes
 
     // PDR Mapping
-    node_histories: HashMap<NodeId, NodePacketHistory>
+    node_histories: HashMap<NodeId, NodePacketHistory>,
 }
 
 impl Default for Topology {
@@ -42,7 +45,7 @@ impl Topology {
             edges: HashMap::new(),
             labels: HashMap::new(),
             node_types: HashMap::new(),
-            node_histories: HashMap::new()
+            node_histories: HashMap::new(),
         }
     }
 
@@ -60,7 +63,12 @@ impl Topology {
 
     /// Get the neighbors of a node
     pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
-        self.edges.get(&node_id).unwrap_or(&HashSet::new()).iter().copied().collect()
+        self.edges
+            .get(&node_id)
+            .unwrap_or(&HashSet::new())
+            .iter()
+            .copied()
+            .collect()
     }
 
     /// Clear the topology
@@ -100,9 +108,7 @@ impl Topology {
 
     /// Function that removed the edges between two node, both from node1 to node2 and vice versa
     pub fn remove_edges(&mut self, node1: NodeId, node2: NodeId) {
-
         for (&id, neighbors) in self.edges.iter_mut() {
-
             if id == node1 {
                 neighbors.retain(|&id| id != node2);
             } else if id == node2 {
@@ -118,7 +124,6 @@ impl Topology {
     /// * `node_id: Vec<NodeId>` - vector of nodes to update
     /// * `dropped: bool` - if `true` then will increase the packets_dropped, else the packets_sent
     pub fn update_node_history(&mut self, node_ids: &Vec<NodeId>, dropped: bool) {
-
         for id in node_ids {
             let history = self.node_histories.entry(*id).or_default();
             if dropped {
@@ -131,7 +136,6 @@ impl Topology {
 
     /// Function that returns the estimated PDR, based on the history of the node
     pub fn pdr_for_node(&mut self, node_id: NodeId) -> u64 {
-
         let history = self.node_histories.entry(node_id).or_default();
 
         if history.packets_sent > 0 {

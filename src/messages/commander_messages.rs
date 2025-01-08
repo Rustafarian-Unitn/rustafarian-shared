@@ -28,7 +28,7 @@ pub enum SimControllerCommand {
     RegisteredServers,           // Request the list of servers to which the client is registered
     RemoveSender(NodeId),        // Remove a sender from the list of neighbors
     AddSender(NodeId, Sender<Packet>), // Add a sender to the list of neighbors
-    RequestServerType(NodeId),        // Request the type of a server
+    RequestServerType(NodeId),   // Request the type of a server
 }
 
 /**
@@ -42,10 +42,10 @@ pub enum SimControllerMessage {
     MessageReceived(NodeId, NodeId, String), // A message received by a client (server_id, node_from, message)
     TextFileResponse(u8, String),            // Response to a text file request
     MediaFileResponse(u8, Vec<u8>),          // Response to a media file request
-    FileListResponse(NodeId,Vec<u8>),        // Response  a file list request the NodeId refers to the server generating the response
-    ServerTypeResponse(NodeId, ServerType),  // Response to ServerType request from a client
+    FileListResponse(NodeId, Vec<u8>), // Response  a file list request the NodeId refers to the server generating the response
+    ServerTypeResponse(NodeId, ServerType), // Response to ServerType request from a client
     KnownServers(HashMap<NodeId, ServerType>), // Response to KnownServers request from a client
-    RegisteredServersResponse(Vec<u8>),      // Response to a list of registered servers
+    RegisteredServersResponse(Vec<u8>), // Response to a list of registered servers
 }
 
 impl DroneSend for SimControllerMessage {}
