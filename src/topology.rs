@@ -1,7 +1,14 @@
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 use serde::{Deserialize, Serialize};
 use wg_2024::network::{NodeId, SourceRoutingHeader};
+
+/// History of a drone, recording the total number of packet sent and the number of packet dropped
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
+pub struct NodePacketHistory {
+    pub packets_sent: u64,
+    pub packets_dropped: u64,
+}
 
 /// A simple graph representation of the network topology
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -10,6 +17,9 @@ pub struct Topology {
     edges: HashMap<NodeId, HashSet<NodeId>>, // All the connections between nodes.
     labels: HashMap<NodeId, String>,         // The labels of the nodes
     node_types: HashMap<NodeId, String>,     // The types of the nodes
+
+    // PDR Mapping
+    node_histories: HashMap<NodeId, NodePacketHistory>,
 }
 
 impl Default for Topology {
@@ -26,6 +36,7 @@ impl Topology {
             edges: HashMap::new(),
             labels: HashMap::new(),
             node_types: HashMap::new(),
+            node_histories: HashMap::new(),
         }
     }
 
@@ -43,7 +54,12 @@ impl Topology {
 
     /// Get the neighbors of a node
     pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
-        self.edges.get(&node_id).unwrap_or(&HashSet::new()).iter().copied().collect()
+        self.edges
+            .get(&node_id)
+            .unwrap_or(&HashSet::new())
+            .iter()
+            .copied()
+            .collect()
     }
 
     /// Clear the topology
@@ -63,12 +79,12 @@ impl Topology {
     }
 
     pub fn get_routing_header(
-        &self,
+        &mut self,
         client_id: NodeId,
         server_id: NodeId,
     ) -> wg_2024::network::SourceRoutingHeader {
         let mut header = SourceRoutingHeader::empty_route();
-        header.hops = compute_route(self, client_id, server_id);
+        header.hops = compute_route_dijkstra(self, client_id, server_id);
         header.hop_index = 1;
         header
     }
@@ -83,14 +99,41 @@ impl Topology {
 
     /// Function that removed the edges between two node, both from node1 to node2 and vice versa
     pub fn remove_edges(&mut self, node1: NodeId, node2: NodeId) {
-
         for (&id, neighbors) in self.edges.iter_mut() {
-
             if id == node1 {
                 neighbors.retain(|&id| id != node2);
             } else if id == node2 {
                 neighbors.retain(|&id| id != node1);
             }
+        }
+    }
+
+    /// Function that updates the history of a list of nodes, based on the drooped flag.
+    /// Should only be called for MsgFragment, since they are the only droppable packets
+    ///
+    /// # Args
+    /// * `node_id: Vec<NodeId>` - vector of nodes to update
+    /// * `dropped: bool` - if `true` then will increase the packets_dropped, else the packets_sent
+    pub fn update_node_history(&mut self, node_ids: &Vec<NodeId>, dropped: bool) {
+        for id in node_ids {
+            let history = self.node_histories.entry(*id).or_default();
+            if dropped {
+                history.packets_dropped += 1;
+            } else {
+                history.packets_sent += 1;
+            }
+        }
+    }
+
+    /// Function that returns the estimated PDR, from 0 to 100, based on the history of the node.
+    pub fn pdr_for_node(&mut self, node_id: NodeId) -> u64 {
+
+        let history = self.node_histories.entry(node_id).or_default();
+
+        if history.packets_sent > 0 {
+            (history.packets_dropped / history.packets_sent) * 100
+        } else {
+            0
         }
     }
 
@@ -140,6 +183,64 @@ pub fn compute_route(
                 visited.insert(neighbor);
                 parent.insert(neighbor, current_node);
                 queue.push_back(neighbor);
+            }
+        }
+    }
+    route
+}
+
+/// Compute a route between two nodes, using an adaptation of the Dijkstra algorithm, where the
+/// distance between the nodes is found using the PDR of the node
+pub fn compute_route_dijkstra(
+    topology: &mut Topology,
+    source_id: NodeId,
+    destination_id: NodeId,
+) -> Vec<NodeId> {
+
+
+    let mut route = Vec::new(); // Final route
+    let mut visited = HashSet::new(); // Node already visited
+    let mut queue = BinaryHeap::new(); // Used to prioritize nodes based on PDR
+    // "Distances" to each node, it is based on the PDR for each node
+    let mut distances = HashMap::new();
+    let mut parent = HashMap::new();
+
+    // Initiate the source with distance 0, since it is the starting point
+    distances.insert(source_id, 0);
+    queue.push((0, source_id));
+
+    while let Some((current_distance, current_node)) = queue.pop() {
+
+        // If destination is reached, then reconstruct the path, based on the parents nodes and
+        // reversing it at the end
+        if current_node == destination_id {
+            let mut node = destination_id;
+            while node != source_id {
+                route.push(node);
+                node = parent[&node];
+            }
+            route.push(source_id);
+            route.reverse();
+            return route;
+        }
+
+        // If the node has already been visited, then ignore it
+        if !visited.insert(current_node) {
+            continue;
+        }
+
+        for neighbor in topology.neighbors(current_node) {
+            // For every neighbour of the current node, find the distance (cumulative)
+            // from the source to the node, based on the PDR
+            let drop_rate = topology.pdr_for_node(neighbor);
+            let new_distance = current_distance + drop_rate;
+
+            // If the distance is less then the one that was already found, then insert
+            // this as the new distance, and update the parent map
+            if new_distance < *distances.get(&neighbor).unwrap_or(&u64::MAX) {
+                distances.insert(neighbor, new_distance);
+                parent.insert(neighbor, current_node);
+                queue.push((new_distance, neighbor));
             }
         }
     }
