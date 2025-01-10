@@ -4,7 +4,11 @@ use wg_2024::network::NodeId;
 /// * `INFO`: default log level, will always be printed
 /// * `DEBUG`: used only in debug situation, will not print if the debug flag is `false`
 /// * `ERROR`: will print the message to `io::stderr`
-pub enum LogLevel { INFO, DEBUG, ERROR }
+pub enum LogLevel {
+    INFO,
+    DEBUG,
+    ERROR,
+}
 
 /// Struct used to cleanly log messages and information
 ///
@@ -14,16 +18,15 @@ pub enum LogLevel { INFO, DEBUG, ERROR }
 pub struct Logger {
     node_type: String,
     node_id: NodeId,
-    debug: bool
+    debug: bool,
 }
 
 impl Logger {
-
     pub fn new(node_type: String, node_id: NodeId, debug: bool) -> Logger {
         Logger {
             node_type,
             node_id,
-            debug
+            debug,
         }
     }
 
@@ -35,27 +38,28 @@ impl Logger {
     ///     * `INFO`: default log level, will always be printed
     ///     * `DEBUG`: used only in debug situation, will not print if the debug flag is `false`
     ///     * `ERROR`: will print the message to `io::stderr`
-    pub fn log(
-        &self,
-        log_message: &str,
-        log_level: LogLevel,
-    ) {
-
+    pub fn log(&self, log_message: &str, log_level: LogLevel) {
         match log_level {
             LogLevel::INFO => {
-                print!("[{} {}] - LEVEL: INFO >>> ", self.node_type, self.node_id);
-                println!("{}", log_message);
+                println!(
+                    "[{} {}] - LEVEL: INFO >>> {}",
+                    self.node_type, self.node_id, log_message
+                );
             }
             LogLevel::DEBUG => {
                 if self.debug {
-                    print!("[{} {}] - LEVEL: DEBUG >>> ", self.node_type, self.node_id);
-                    println!("{}", log_message);
+                    println!(
+                        "[{} {}] - LEVEL: DEBUG >>> {}",
+                        self.node_type, self.node_id, log_message
+                    );
                 }
             }
             LogLevel::ERROR => {
-                eprint!("[{} {}] - LEVEL: ERROR >>> ",  self.node_type, self.node_id);
-                eprintln!("{}", log_message);}
+                println!(
+                    "[{} {}] - LEVEL: ERROR >>> {}",
+                    self.node_type, self.node_id, log_message
+                );
+            }
         }
     }
-
 }
