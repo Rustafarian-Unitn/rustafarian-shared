@@ -127,7 +127,6 @@ impl Topology {
 
     /// Function that returns the estimated PDR, from 0 to 100, based on the history of the node.
     pub fn pdr_for_node(&mut self, node_id: NodeId) -> u64 {
-
         let history = self.node_histories.entry(node_id).or_default();
 
         if history.packets_sent > 0 {
@@ -196,12 +195,10 @@ pub fn compute_route_dijkstra(
     source_id: NodeId,
     destination_id: NodeId,
 ) -> Vec<NodeId> {
-
-
     let mut route = Vec::new(); // Final route
     let mut visited = HashSet::new(); // Node already visited
     let mut queue = BinaryHeap::new(); // Used to prioritize nodes based on PDR
-    // "Distances" to each node, it is based on the PDR for each node
+                                       // "Distances" to each node, it is based on the PDR for each node
     let mut distances = HashMap::new();
     let mut parent = HashMap::new();
 
@@ -210,7 +207,6 @@ pub fn compute_route_dijkstra(
     queue.push((0, source_id));
 
     while let Some((current_distance, current_node)) = queue.pop() {
-
         // If destination is reached, then reconstruct the path, based on the parents nodes and
         // reversing it at the end
         if current_node == destination_id {

@@ -45,8 +45,8 @@ pub enum SimControllerMessage {
     FileListResponse(NodeId, Vec<u8>), // Response  a file list request the NodeId refers to the server generating the response
     ServerTypeResponse(NodeId, ServerType), // Response to ServerType request from a client
     KnownServers(HashMap<NodeId, ServerType>), // Response to KnownServers request from a client
-    RegisteredServersResponse(Vec<u8>),      // Response to a list of registered servers
-    TextWithReferences(u8, String, HashMap<u8, Vec<u8>>) // File Id, Text, References
+    RegisteredServersResponse(Vec<u8>), // Response to a list of registered servers
+    TextWithReferences(u8, String, HashMap<u8, Vec<u8>>), // File Id, Text, References
 }
 
 impl DroneSend for SimControllerMessage {}
@@ -56,9 +56,7 @@ impl Request for SimControllerMessage {}
 pub enum SimControllerEvent {
     ChatMessageSent(NodeId, NodeId, String), // A message sent by a client (server_id, node_to, message)
     FloodRequestSent,
-    MessageSent {
-        session_id: u64,
-    } // When a text message is sent via fragmentation
+    MessageSent { session_id: u64 }, // When a text message is sent via fragmentation
 }
 
 impl DroneSend for SimControllerEvent {}
