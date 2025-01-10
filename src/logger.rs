@@ -55,7 +55,7 @@ impl Logger {
                 }
             }
             LogLevel::ERROR => {
-                println!(
+                eprintln!(
                     "[{} {}] - LEVEL: ERROR >>> {}",
                     self.node_type, self.node_id, log_message
                 );
