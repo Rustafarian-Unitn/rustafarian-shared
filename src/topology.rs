@@ -130,7 +130,7 @@ impl Topology {
         let history = self.node_histories.entry(node_id).or_default();
 
         if history.packets_sent > 0 {
-            (history.packets_dropped / history.packets_sent) * 100
+            ((history.packets_dropped as f64 / history.packets_sent as f64) * 100f64) as u64
         } else {
             0
         }
