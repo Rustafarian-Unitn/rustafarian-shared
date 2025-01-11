@@ -151,6 +151,10 @@ impl Topology {
     pub fn set_node_type(&mut self, node_id: NodeId, node_type: String) {
         self.node_types.insert(node_id, node_type);
     }
+
+    pub fn get_node_types(&self) -> &HashMap<NodeId, String> {
+        &self.node_types
+    }
 }
 
 // BFS search between a starting node and a destination

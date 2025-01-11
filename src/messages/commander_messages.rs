@@ -56,7 +56,9 @@ impl Request for SimControllerMessage {}
 pub enum SimControllerEvent {
     ChatMessageSent(NodeId, NodeId, String), // A message sent by a client (server_id, node_to, message)
     FloodRequestSent,
-    MessageSent { session_id: u64 }, // When a text message is sent via fragmentation
+    MessageSent {
+        session_id: u64,
+    }, // When a text message is sent via fragmentation
     PacketForwarded {
         session_id: u64,
         packet_type: String,
