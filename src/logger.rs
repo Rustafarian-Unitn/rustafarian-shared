@@ -15,6 +15,7 @@ pub enum LogLevel {
 /// * `node_type: String` - the type of the node logging the information, e.g. Chat Client
 /// * `node_id: NodeId` - the id of the node logging the information
 /// * `debug: bool ` - debug flag, if true then it will log DEBUG level
+#[derive(Debug)]
 pub struct Logger {
     node_type: String,
     node_id: NodeId,
