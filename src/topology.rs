@@ -252,7 +252,7 @@ pub fn compute_route_dijkstra(
 
         for neighbor in topology.neighbors(node.id) {
             // Skip neighbors that are not of type "Drone" unless they are the destination
-            if topology.get_node_type(neighbor).map_or(false, |t| t != "Drone") && neighbor != destination_id {
+            if topology.get_node_type(neighbor).map_or(false, |t| t != "drone") && neighbor != destination_id {
                 continue;
             }
             // For every neighbour of the current node, find the distance (cumulative)
