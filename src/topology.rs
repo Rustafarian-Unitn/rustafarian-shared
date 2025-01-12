@@ -85,7 +85,7 @@ impl Topology {
         server_id: NodeId,
     ) -> wg_2024::network::SourceRoutingHeader {
         let mut header = SourceRoutingHeader::empty_route();
-        header.hops = compute_route_dijkstra(self, client_id, server_id);
+        header.hops = compute_route(self, client_id, server_id);
         header.hop_index = 1;
         header
     }
