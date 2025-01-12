@@ -44,7 +44,7 @@ impl Topology {
     /// Add a new node to the topology (NodeId: u8)
     pub fn add_node(&mut self, node: NodeId) {
         self.nodes.push(node);
-        self.edges.insert(node, HashSet::new());
+        self.edges.entry(node).or_default();
     }
 
     /// Add a new edge between two nodes
@@ -85,7 +85,7 @@ impl Topology {
         server_id: NodeId,
     ) -> wg_2024::network::SourceRoutingHeader {
         let mut header = SourceRoutingHeader::empty_route();
-        header.hops = compute_route(self, client_id, server_id);
+        header.hops = compute_route_dijkstra(self, client_id, server_id);
         header.hop_index = 1;
         header
     }
@@ -197,7 +197,7 @@ pub fn compute_route(
 /// Used to store distance information for the node, and sort them in the BinaryHeap
 struct Node {
     id: NodeId,
-    distance: u64
+    distance: u64,
 }
 
 // Invert ordering for binary heap, by default it prioritize higher values
@@ -229,7 +229,10 @@ pub fn compute_route_dijkstra(
 
     // Initiate the source with distance 0, since it is the starting point
     distances.insert(source_id, 0);
-    queue.push(Node { id: source_id, distance: 0 });
+    queue.push(Node {
+        id: source_id,
+        distance: 0,
+    });
 
     while let Some(node) = queue.pop() {
         // If destination is reached, then reconstruct the path, based on the parents nodes and
@@ -252,7 +255,11 @@ pub fn compute_route_dijkstra(
 
         for neighbor in topology.neighbors(node.id) {
             // Skip neighbors that are not of type "Drone" unless they are the destination
-            if topology.get_node_type(neighbor).map_or(false, |t| t != "drone") && neighbor != destination_id {
+            if topology
+                .get_node_type(neighbor)
+                .map_or(false, |t| t != "drone")
+                && neighbor != destination_id
+            {
                 continue;
             }
             // For every neighbour of the current node, find the distance (cumulative)
@@ -265,7 +272,10 @@ pub fn compute_route_dijkstra(
             if new_distance < *distances.get(&neighbor).unwrap_or(&u64::MAX) {
                 distances.insert(neighbor, new_distance);
                 parent.insert(neighbor, node.id);
-                queue.push(Node{ id: neighbor, distance: new_distance });
+                queue.push(Node {
+                    id: neighbor,
+                    distance: new_distance,
+                });
             }
         }
     }
