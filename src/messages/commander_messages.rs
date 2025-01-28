@@ -29,6 +29,7 @@ pub enum SimControllerCommand {
     RemoveSender(NodeId),        // Remove a sender from the list of neighbors
     AddSender(NodeId, Sender<Packet>), // Add a sender to the list of neighbors
     RequestServerType(NodeId),   // Request the type of a server
+    Shutdown,                    // Shutdown the client/server
 }
 
 /**
