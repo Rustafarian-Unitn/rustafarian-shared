@@ -20,7 +20,7 @@ impl Default for Assembler {
 }
 
 impl Assembler {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         Assembler {
             received_fragment: HashMap::new(),
         }

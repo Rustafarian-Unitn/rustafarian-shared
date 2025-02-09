@@ -31,7 +31,7 @@ impl Default for Topology {
 
 impl Topology {
     /// Create a new empty topology
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         Topology {
             nodes: Vec::new(),
             edges: HashMap::new(),
@@ -41,7 +41,7 @@ impl Topology {
         }
     }
 
-    /// Add a new node to the topology (NodeId: u8)
+    /// Add a new node to the topology (`NodeId`: u8)
     pub fn add_node(&mut self, node: NodeId) {
         self.nodes.push(node);
         self.edges.entry(node).or_default();
@@ -54,7 +54,7 @@ impl Topology {
     }
 
     /// Get the neighbors of a node
-    pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
+    #[must_use] pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
         self.edges
             .get(&node_id)
             .unwrap_or(&HashSet::new())
@@ -70,12 +70,12 @@ impl Topology {
     }
 
     /// Get the nodes of the topology
-    pub fn nodes(&self) -> &Vec<NodeId> {
+    #[must_use] pub fn nodes(&self) -> &Vec<NodeId> {
         &self.nodes
     }
 
     /// Get the edges of the topology
-    pub fn edges(&self) -> &HashMap<NodeId, HashSet<NodeId>> {
+    #[must_use] pub fn edges(&self) -> &HashMap<NodeId, HashSet<NodeId>> {
         &self.edges
     }
 
@@ -100,7 +100,7 @@ impl Topology {
 
     /// Function that removed the edges between two node, both from node1 to node2 and vice versa
     pub fn remove_edges(&mut self, node1: NodeId, node2: NodeId) {
-        for (&id, neighbors) in self.edges.iter_mut() {
+        for (&id, neighbors) in &mut self.edges {
             if id == node1 {
                 neighbors.retain(|&id| id != node2);
             } else if id == node2 {
@@ -110,11 +110,11 @@ impl Topology {
     }
 
     /// Function that updates the history of a list of nodes, based on the drooped flag.
-    /// Should only be called for MsgFragment, since they are the only droppable packets
+    /// Should only be called for `MsgFragment`, since they are the only droppable packets
     ///
     /// # Args
     /// * `node_id: Vec<NodeId>` - vector of nodes to update
-    /// * `dropped: bool` - if `true` then will increase the packets_dropped, else the packets_sent
+    /// * `dropped: bool` - if `true` then will increase the `packets_dropped`, else the `packets_sent`
     pub fn update_node_history(&mut self, node_ids: &Vec<NodeId>, dropped: bool) {
         for id in node_ids {
             let history = self.node_histories.entry(*id).or_default();
@@ -137,7 +137,7 @@ impl Topology {
         }
     }
 
-    pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
+    #[must_use] pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
         self.labels.get(&node_id)
     }
 
@@ -145,7 +145,7 @@ impl Topology {
         self.labels.insert(node_id, label);
     }
 
-    pub fn get_node_type(&self, node_id: NodeId) -> Option<&String> {
+    #[must_use] pub fn get_node_type(&self, node_id: NodeId) -> Option<&String> {
         self.node_types.get(&node_id)
     }
 
@@ -153,13 +153,13 @@ impl Topology {
         self.node_types.insert(node_id, node_type);
     }
 
-    pub fn get_node_types(&self) -> &HashMap<NodeId, String> {
+    #[must_use] pub fn get_node_types(&self) -> &HashMap<NodeId, String> {
         &self.node_types
     }
 }
 
 // BFS search between a starting node and a destination
-pub fn compute_route(
+#[must_use] pub fn compute_route(
     topology: &Topology,
     source_id: NodeId,
     destination_id: NodeId,
@@ -171,7 +171,7 @@ pub fn compute_route(
     visited.insert(source_id);
     let mut parent = HashMap::new();
     while !queue.is_empty() {
-        let current_node = queue.pop_front().unwrap();
+        let current_node = queue.pop_front().unwrap_or_default(); // Default is impossible because we check if the queue is empty before entering the while
         if current_node == destination_id {
             let mut node = destination_id;
             while node != source_id {
@@ -194,7 +194,7 @@ pub fn compute_route(
 }
 
 #[derive(Eq, PartialEq, Debug)]
-/// Used to store distance information for the node, and sort them in the BinaryHeap
+/// Used to store distance information for the node, and sort them in the `BinaryHeap`
 struct Node {
     id: NodeId,
     distance: u64,

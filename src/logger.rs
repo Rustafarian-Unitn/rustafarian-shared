@@ -23,7 +23,7 @@ pub struct Logger {
 }
 
 impl Logger {
-    pub fn new(node_type: String, node_id: NodeId, debug: bool) -> Logger {
+    #[must_use] pub fn new(node_type: String, node_id: NodeId, debug: bool) -> Logger {
         Logger {
             node_type,
             node_id,
