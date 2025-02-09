@@ -31,7 +31,8 @@ impl Default for Topology {
 
 impl Topology {
     /// Create a new empty topology
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         Topology {
             nodes: Vec::new(),
             edges: HashMap::new(),
@@ -54,7 +55,8 @@ impl Topology {
     }
 
     /// Get the neighbors of a node
-    #[must_use] pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
+    #[must_use]
+    pub fn neighbors(&self, node_id: NodeId) -> Vec<NodeId> {
         self.edges
             .get(&node_id)
             .unwrap_or(&HashSet::new())
@@ -70,12 +72,14 @@ impl Topology {
     }
 
     /// Get the nodes of the topology
-    #[must_use] pub fn nodes(&self) -> &Vec<NodeId> {
+    #[must_use]
+    pub fn nodes(&self) -> &Vec<NodeId> {
         &self.nodes
     }
 
     /// Get the edges of the topology
-    #[must_use] pub fn edges(&self) -> &HashMap<NodeId, HashSet<NodeId>> {
+    #[must_use]
+    pub fn edges(&self) -> &HashMap<NodeId, HashSet<NodeId>> {
         &self.edges
     }
 
@@ -137,7 +141,8 @@ impl Topology {
         }
     }
 
-    #[must_use] pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
+    #[must_use]
+    pub fn get_label(&self, node_id: NodeId) -> Option<&String> {
         self.labels.get(&node_id)
     }
 
@@ -145,7 +150,8 @@ impl Topology {
         self.labels.insert(node_id, label);
     }
 
-    #[must_use] pub fn get_node_type(&self, node_id: NodeId) -> Option<&String> {
+    #[must_use]
+    pub fn get_node_type(&self, node_id: NodeId) -> Option<&String> {
         self.node_types.get(&node_id)
     }
 
@@ -153,13 +159,15 @@ impl Topology {
         self.node_types.insert(node_id, node_type);
     }
 
-    #[must_use] pub fn get_node_types(&self) -> &HashMap<NodeId, String> {
+    #[must_use]
+    pub fn get_node_types(&self) -> &HashMap<NodeId, String> {
         &self.node_types
     }
 }
 
 // BFS search between a starting node and a destination
-#[must_use] pub fn compute_route(
+#[must_use]
+pub fn compute_route(
     topology: &Topology,
     source_id: NodeId,
     destination_id: NodeId,
